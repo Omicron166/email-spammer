@@ -19,7 +19,7 @@ with open('victims.txt') as f:
 
 
 try:
-    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server = smtplib.SMTP(settings['server']['ip'], settings['server']['port'])
     server.ehlo()
     server.starttls()
     server.login(settings['credentials']['email'], settings['credentials']['password'])
