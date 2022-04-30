@@ -1,21 +1,46 @@
 import smtplib
 from sys import exit
 import json
+from os.path import isfile
 from time import sleep
 
 #parse tool settings
-with open('settings.json') as f:
-    settings = json.load(f)
+if isfile('config.json'):
+    with open('settings.json', 'r') as f:
+        settings = json.load(f)
+else:
+    settings = {
+        "credentials": {
+            "email": "",
+            "password": ""
+        },
+        "server": {
+            "ip": "smtp.gmail.com",
+            "port": 587
+        },
+        "template": ""
+    }
+    with open('config.json', 'w') as f:
+        json.dump(settings, f)
+    print('[!] Please check and fill config.json')
+    exit()
 
 #parse victim list
-with open('victims.txt') as f:
-    raw_victims = f.readlines()
-    victims = []
-    for victim in raw_victims:
-        if victim.replace('\n', '') != '':
-            victims.append(
-                victim.replace('\n', '')
-            )
+if isfile('victims.txt'):
+    with open('victims.txt') as f:
+        raw_victims = f.readlines()
+        victims = []
+        for victim in raw_victims:
+            if victim.startswith('#'): continue #skip lines with #
+            if victim.replace('\n', '') != '': #check if empty line
+                victims.append(
+                    victim.replace('\n', '')
+                )
+else:
+    with open('victims.txt', 'w') as f:
+        f.writelines(["#Add an email per line\n"])
+    print('[!] Please fill victims.txt')
+    exit()
 
 
 try:
@@ -36,7 +61,7 @@ try:
             server.sendmail(
                 settings['credentials']['email'], #attacker email addr
                 victim, #victim email addr
-                msg.replace('%victim%', victim_user)#message
+                msg.replace('%victim%', victim_user) #in the template, %victim% is replaced by the victim user
             )
         except Exception as e:
             #set webhook telemetry
