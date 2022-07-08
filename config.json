@@ -1,0 +1,11 @@
+{
+    "credentials": {
+        "email": "",
+        "password": ""
+    },
+    "server": {
+        "ip": "smtp.gmail.com",
+        "port": 587
+    },
+    "template": ""
+}
