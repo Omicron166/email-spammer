@@ -152,4 +152,6 @@ cython_debug/
 #.idea/
 
 # config files
+victims.txt
+config.json
 .vscode/
