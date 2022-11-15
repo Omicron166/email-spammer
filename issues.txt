@@ -1,0 +1,2 @@
+reformar las plantillas:
+    añadir opciones de la plantilla
