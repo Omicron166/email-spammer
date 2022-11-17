@@ -3,6 +3,7 @@ from time import sleep
 
 from core.connection import SMTPConnection
 from core.templates import Template, TemplateEngine
+from core.exceptions import TemplateOptionsError
 
 class Sender(Thread):
     def __init__(self, server: SMTPConnection, options: dict, timeout: int = 1) -> None:
@@ -30,6 +31,19 @@ class Spammer(Sender):
         self.start()
     
     def run(self) -> None:
+        #####################################
+        # Temporal workaround, replace with
+        # native template engine check
+        #####################################
+        self.options['victim'] = 'dummy'
+        self.options['email'] = 'dummy@somewhere.com'
+        try:
+            self.generator.gen_email(self.options)
+        except TemplateOptionsError:
+            self.stop()
+            return
+        #####################################
+
         while self.alive:
             try:
                 victim = self.victims.pop()
@@ -52,12 +66,26 @@ class Bomber(Sender):
     def __init__(self, server: SMTPConnection, victim: str, options: dict, sends: int, timeout: int = 1) -> None:
         super().__init__(server, options, timeout)
         self.victim = victim
-        self.options['victim'] = victim.split('@')[0]
-        self.options['email'] = victim
         self.sends = sends
         self.start()
     
     def run(self) -> None:
+        #####################################
+        # Temporal workaround, replace with
+        # native template engine check
+        #####################################
+        self.options['victim'] = 'dummy'
+        self.options['email'] = 'dummy@somewhere.com'
+        try:
+            self.generator.gen_email(self.options)
+        except TemplateOptionsError:
+            self.stop()
+            return
+        #####################################
+
+        self.options['victim'] = self.victim.split('@')[0]
+        self.options['email'] = self.victim
+
         email = self.generator.gen_email(self.options)
         while self.alive and self.sends > 0:
             try:
