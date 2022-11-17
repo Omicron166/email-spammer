@@ -1,9 +1,11 @@
 from copy import deepcopy
+from re import findall
+from core.exceptions import TemplateOptionsError
 
 class Template(object):
-    def __init__(self, template: str = "Hello %victim%", settings: dict = {}) -> None:
+    def __init__(self, template: str = "Hello %victim%") -> None:
         self.base = template
-        self.settings = settings
+        self.settings = findall(r'%(.*?)%', template)
         
 
 class TemplateEngine(object):
@@ -13,16 +15,16 @@ class TemplateEngine(object):
     def set_template(self, template: Template) -> None:
         self.template = template
 
-    def gen_email(self, email: str) -> str:
+    def gen_email(self, options: dict) -> str:
         result = deepcopy(self.template.base)
-        result.replace(
-            '%victim%',
-            email.split('@')[0]
-        )
 
-        for key in self.template.settings.keys():
-            result.replace(
-                '%' + key + '%',
-                self.template.settings[key]
-            )
+        for key in self.template.settings:
+            try:
+                result.replace(
+                    '%' + key + '%',
+                    options[key]
+                )
+            except KeyError:
+                # Detect not configured options
+                raise TemplateOptionsError
         return result

@@ -1,0 +1,2 @@
+class TemplateOptionsError(Exception):
+    pass
