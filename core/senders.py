@@ -12,6 +12,7 @@ class Sender(Thread):
         self.timeout = timeout
         self.generator = TemplateEngine()
         self.options = options
+        self.status = 'Not started yet'
 
     def set_template(self, template: Template) -> None:
         self.generator.set_template(template)
@@ -22,6 +23,7 @@ class Sender(Thread):
 
     def start(self):
         self.alive = True
+        self.status = 'In progress'
         super().start()
 
 class Spammer(Sender):
@@ -40,6 +42,7 @@ class Spammer(Sender):
         try:
             self.generator.gen_email(self.options)
         except TemplateOptionsError:
+            self.status = 'Template error'
             self.stop()
             return
         #####################################
@@ -47,14 +50,25 @@ class Spammer(Sender):
         while self.alive:
             try:
                 victim = self.victims.pop()
-            except:
+            except NameError:
+                # self.victims deleted by self.stop()
+                self.status = 'Interrupted by the user'
                 break
-            self.options['victim'] = victim.split('@')[0]
-            self.options['email'] = victim
-            email = self.generator.gen_email(self.options)
-            self.server.sendmail(victim, email)
-            sleep(self.timeout)
-    
+            except IndexError:
+                # self.victims is empty
+                self.status = 'Task done'
+                break
+            
+            try:
+                self.options['victim'] = victim.split('@')[0]
+                self.options['email'] = victim
+                email = self.generator.gen_email(self.options)
+                self.server.sendmail(victim, email)
+                sleep(self.timeout)
+            except:
+                self.status = 'Error'
+                break
+
     def sends_left(self) -> int:
         return len(self.victims)
 
@@ -79,6 +93,7 @@ class Bomber(Sender):
         try:
             self.generator.gen_email(self.options)
         except TemplateOptionsError:
+            self.status = 'Template error'
             self.stop()
             return
         #####################################
@@ -94,6 +109,14 @@ class Bomber(Sender):
                 break
             self.sends -= 1
             sleep(self.timeout)
+        
+        # Set the status
+        if self.alive and self.sends > 0:
+            self.status = 'Error'
+        elif not self.alive and self.sends > 0:
+            self.status = 'Interrupted by the user'
+        elif self.sends == 0:
+            self.status = 'Task done'
 
     def sends_left(self) -> int:
         return self.sends
