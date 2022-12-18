@@ -15,9 +15,11 @@ while True:
     if command == 'template':
 
         if args[0] == 'list':
-            # Print a list of the available templates
-            ## Dev note: temporal code, must be replaced with a list of just the template names
-            print(storage.templates)
+            # Print the available template names
+
+            print('Templates:')
+            for template in storage.templates.keys():
+                print('\t' + template)
 
         elif args[0] == 'show':
             if not storage.templates.get(args[1]):
