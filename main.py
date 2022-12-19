@@ -75,3 +75,15 @@ while True:
             # ToDo: Handle file write exceptions
             print('[i] Template exported successfully')
         
+        elif args[0] == 'remove':
+            # Delete a template
+
+            # Check if the template exists
+            if not storage.templates.get(args[1]):
+                print(f'[!] Template {args[1]} not found')
+                continue
+
+            # Delete the template and write the storage
+            storage.templates.pop(args[1])
+            storage.write()
+        
