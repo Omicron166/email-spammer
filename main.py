@@ -1,6 +1,6 @@
 from core.config import ConfigStorage
 from os.path import isfile
-from core.templates import Template
+from core.templates import Template, TemplateEngine
 
 # Initializate the data storage
 storage = ConfigStorage('./.data')
@@ -87,3 +87,21 @@ while True:
             storage.templates.pop(args[1])
             storage.write()
         
+
+    elif command == 'render':
+        if not storage.templates.get(args[0]):
+            print(f'[!] Template {args[0]} not found')
+            continue
+
+        template = Template(storage.templates[args[0]])
+        engine = TemplateEngine()
+        engine.set_template(template)
+        config = {}
+
+        for item in template.settings:
+            config[item] = input(item + ': ')
+        
+        with open('email.txt', 'w') as f:
+            f.write(engine.render(config))
+        # ToDo: Handle file write exceptions
+        print('Email exported successfully to email.txt')
