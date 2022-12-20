@@ -40,7 +40,7 @@ class Spammer(Sender):
         self.options['victim'] = 'dummy'
         self.options['email'] = 'dummy@somewhere.com'
         try:
-            self.generator.gen_email(self.options)
+            self.generator.render(self.options)
         except TemplateOptionsError:
             self.status = 'Template error'
             self.stop()
@@ -62,7 +62,7 @@ class Spammer(Sender):
             try:
                 self.options['victim'] = victim.split('@')[0]
                 self.options['email'] = victim
-                email = self.generator.gen_email(self.options)
+                email = self.generator.render(self.options)
                 self.server.sendmail(victim, email)
                 sleep(self.timeout)
             except:
@@ -91,7 +91,7 @@ class Bomber(Sender):
         self.options['victim'] = 'dummy'
         self.options['email'] = 'dummy@somewhere.com'
         try:
-            self.generator.gen_email(self.options)
+            self.generator.render(self.options)
         except TemplateOptionsError:
             self.status = 'Template error'
             self.stop()
@@ -101,7 +101,7 @@ class Bomber(Sender):
         self.options['victim'] = self.victim.split('@')[0]
         self.options['email'] = self.victim
 
-        email = self.generator.gen_email(self.options)
+        email = self.generator.render(self.options)
         while self.alive and self.sends > 0:
             try:
                 self.server.sendmail(self.victim, email)

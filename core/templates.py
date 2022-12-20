@@ -15,7 +15,7 @@ class TemplateEngine(object):
     def set_template(self, template: Template) -> None:
         self.template = template
 
-    def gen_email(self, options: dict) -> str:
+    def render(self, options: dict) -> str:
         result = deepcopy(self.template.base)
 
         for key in self.template.settings:
