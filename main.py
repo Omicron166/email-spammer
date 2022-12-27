@@ -22,6 +22,8 @@ while True:
                 print('\t' + template)
 
         elif args[0] == 'show':
+            # Print a template on the terminal
+
             if not storage.templates.get(args[1]):
                 print(f'[!] Template {args[1]} not found')
                 continue
@@ -89,6 +91,8 @@ while True:
         
 
     elif command == 'render':
+        # Render a template
+
         if not storage.templates.get(args[0]):
             print(f'[!] Template {args[0]} not found')
             continue
