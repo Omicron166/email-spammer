@@ -5,7 +5,10 @@ class ConfigStorage(object):
     def __init__(self, datafolder: str) -> None:
         self.datafolder = datafolder
         self.connections = {}
-        self.victims = {}
+        self.victims = {
+            "unique": {},
+            "groups": {}
+        }
         self.templates = {}
 
         if not path.isdir(datafolder):
