@@ -1,9 +1,13 @@
 from core.config import ConfigStorage
 from os.path import isfile
 from core.templates import Template, TemplateEngine
+from core.senders import Spammer, Bomber
+from core.connection import SMTPConnection
 
 # Initializate the data storage
 storage = ConfigStorage('./.data')
+
+attacks = []
 
 while True:
     cmd = input('email-spammer> ')
@@ -90,22 +94,23 @@ while True:
             storage.write()
         
 
-    elif command == 'render':
-        # Render a template
+        elif args[0] == 'render':
+            # Render a template
 
-        if not storage.templates.get(args[0]):
-            print(f'[!] Template {args[0]} not found')
-            continue
+            if not storage.templates.get(args[1]):
+                print(f'[!] Template {args[1]} not found')
+                continue
 
-        template = Template(storage.templates[args[0]])
-        engine = TemplateEngine()
-        engine.set_template(template)
-        config = {}
+            template = Template(storage.templates[args[1]])
+            engine = TemplateEngine()
+            engine.set_template(template)
+            config = {}
 
-        for item in template.settings:
-            config[item] = input(item + ': ')
-        
-        with open('email.txt', 'w') as f:
-            f.write(engine.render(config))
-        # ToDo: Handle file write exceptions
-        print('Email exported successfully to email.txt')
+            for item in template.settings:
+                config[item] = input(item + ': ')
+
+            with open('email.txt', 'w') as f:
+                f.write(engine.render(config))
+            # ToDo: Handle file write exceptions
+            print('Email exported successfully to email.txt')
+
