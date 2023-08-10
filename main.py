@@ -6,7 +6,7 @@ from time import sleep
 
 #parse tool settings
 if isfile('config.json'):
-    with open('settings.json', 'r') as f:
+    with open('config.json', 'r') as f:
         settings = json.load(f)
 else:
     settings = {
